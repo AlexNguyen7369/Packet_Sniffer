@@ -1,9 +1,16 @@
 from scapy.all import *
+import argparse
 
 # UDP Proto Number = 17
 # TCP Proto Number = 6
 
-def IP_sniffer(pkt):
+parser = argparse.ArgumentParser(description="Protocol Packet Sniffer (Default = IP)")
+parser.add_argument("--iface", default="en0", help="Network interface to sniff")
+parser.add_argument("--count", type=int, default=10, help="minimum amount of packets to capture before exiting (0 = infinite)")
+parser.add_argument("--filter", default="ip", help="Protocol to sniff in packets, default is ip")
+args = parser.parse_args()
+
+def packet_sniffer(pkt):
 
     if IP in pkt:
 
@@ -26,4 +33,4 @@ def IP_sniffer(pkt):
         print("\n")
 
 
-sniff(iface="en0", prn=IP_sniffer, store=False, count=10, filter="ip")
+sniff(iface=args.iface, prn=packet_sniffer, store=False, count=args.count, filter=args.filter)
