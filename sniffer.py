@@ -26,4 +26,4 @@ def IP_sniffer(pkt):
         print("\n")
 
 
-sniff(iface="en0", prn=IP_sniffer, store=False, count=10)
+sniff(iface="en0", prn=IP_sniffer, store=False, count=10, filter="ip")
