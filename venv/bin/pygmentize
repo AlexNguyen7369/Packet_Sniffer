@@ -1,8 +1,0 @@
-#!/bin/sh
-'''exec' "/Users/alexnguyen7369/Documents/GitHub/Personal Projects/Scapy-Packet-Sniffer/venv/bin/python3.14" "$0" "$@"
-' '''
-import sys
-from pygments.cmdline import main
-if __name__ == '__main__':
-    sys.argv[0] = sys.argv[0].removesuffix('.exe')
-    sys.exit(main())
