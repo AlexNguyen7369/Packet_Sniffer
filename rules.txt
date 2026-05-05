@@ -1,0 +1,11 @@
+# Snort-style rules for IDS
+# Format: alert <proto> <src_ip> <src_port> -> <dst_ip> <dst_port> (options)
+# Use "any" for wildcard. Options: msg, sid, flags, threshold
+
+alert tcp any any -> any 80 (msg:"HTTP traffic detected"; sid:1001;)
+alert tcp any any -> any 443 (msg:"HTTPS traffic detected"; sid:1002;)
+alert tcp any any -> any any (msg:"Possible SYN flood"; flags:S; threshold:50; sid:1003;)
+alert udp any any -> any 53 (msg:"DNS query detected"; sid:1004;)
+alert icmp any any -> any any (msg:"ICMP ping detected"; sid:1005;)
+alert tcp any any -> any 22 (msg:"SSH connection attempt"; sid:1006;)
+alert tcp any any -> any 23 (msg:"Telnet connection attempt"; sid:1007;)
