@@ -78,6 +78,59 @@ sudo python3 syn_flood.py --target 192.168.1.1 --port 80 --count 500 --output fl
 | `--count` | `100` | Number of SYN packets to send (`0` = infinite) |
 | `--output` | unset | Write flood metrics to JSON |
 
+### Packet Logger
+
+Captures packets, prints live one-line summaries, saves to `.pcap`, and prints a traffic summary after capture.
+
+```bash
+sudo python3 packet_logger.py
+sudo python3 packet_logger.py --iface en0 --count 100 --filter tcp --output capture.pcap
+```
+
+| Flag       | Default      | Description                          |
+|------------|--------------|--------------------------------------|
+| `--iface`  | en0          | Network interface to sniff           |
+| `--count`  | 50           | Number of packets to capture (0 = infinite) |
+| `--filter` | ip           | BPF filter (e.g. tcp, udp, icmp)     |
+| `--output` | capture.pcap | Output file name                     |
+
+### SYN Flood Detector
+
+Monitors network traffic and alerts when a possible SYN flood is detected.
+
+```bash
+sudo python3 syn_detect.py
+sudo python3 syn_detect.py --iface en0 --threshold 100
+```
+
+| Flag          | Default | Description                              |
+|---------------|---------|------------------------------------------|
+| `--iface`     | en0     | Network interface to monitor             |
+| `--threshold` | 50      | SYN packets/sec to trigger an alert      |
+
+### Rule-Based IDS
+
+Intrusion detection system that matches live traffic against Snort-style rules defined in a text file.
+
+```bash
+sudo python3 ids.py
+sudo python3 ids.py --iface en0 --rules rules.txt
+```
+
+| Flag      | Default   | Description                |
+|-----------|-----------|----------------------------|
+| `--iface` | en0       | Network interface to monitor |
+| `--rules` | rules.txt | Path to rules file         |
+
+Rules are defined in `rules.txt` using this format:
+
+```
+alert tcp any any -> any 80 (msg:"HTTP traffic detected"; sid:1001;)
+alert tcp any any -> any any (msg:"Possible SYN flood"; flags:S; threshold:50; sid:1003;)
+```
+
+Supports: protocol matching, IP/port filtering, TCP flag checks, and rate-based threshold alerts.
+
 ## Metrics workflow
 
 ### `metrics_runner.py`

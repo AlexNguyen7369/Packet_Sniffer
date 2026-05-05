@@ -4,10 +4,7 @@ import time
 
 from scapy.all import IP, TCP, RandIP, RandShort, send
 
-# For authorized/lab use only. Running this against systems you do not own
-# or have explicit written permission to test is illegal.
-
-parser = argparse.ArgumentParser(description="SYN Flood Simulator (lab use only)")
+parser = argparse.ArgumentParser(description="SYN Flood Simulator")
 parser.add_argument("--target", required=True, help="Target IP address")
 parser.add_argument("--port", type=int, required=True, help="Target port")
 parser.add_argument("--count", type=int, default=100, help="Number of SYN packets to send (0 = infinite)")
