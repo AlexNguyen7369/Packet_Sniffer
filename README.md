@@ -247,6 +247,89 @@ Expected result:
 - IPsec encaps and decaps counters should increase
 - A ping from one inside PC to the other should succeed
 
+## Firewall upgrades
+
+After the VPN works, harden the outside interfaces with inbound ACLs. The goal is to allow only:
+
+- IKE on UDP `500`
+- NAT-T on UDP `4500`
+- ESP for IPsec payload transport
+- ICMP for lab testing
+
+Everything else from the outside should be denied and logged.
+
+### Router A outside firewall
+
+Apply this to `R1` if the outside interface is `s0/0/0` and the peer is `209.165.200.230`:
+
+```text
+configure terminal
+
+ip access-list extended OUTSIDE-IN
+ permit udp host 209.165.200.230 host 209.165.200.225 eq 500
+ permit udp host 209.165.200.230 host 209.165.200.225 eq 4500
+ permit esp host 209.165.200.230 host 209.165.200.225
+ permit icmp any any
+ deny ip any any log
+exit
+
+interface s0/0/0
+ ip access-group OUTSIDE-IN in
+exit
+
+end
+write memory
+```
+
+### Router B outside firewall
+
+Apply this to `R2` if the outside interface is `s0/0/0` and the peer is `209.165.200.225`:
+
+```text
+configure terminal
+
+ip access-list extended OUTSIDE-IN
+ permit udp host 209.165.200.225 host 209.165.200.230 eq 500
+ permit udp host 209.165.200.225 host 209.165.200.230 eq 4500
+ permit esp host 209.165.200.225 host 209.165.200.230
+ permit icmp any any
+ deny ip any any log
+exit
+
+interface s0/0/0
+ ip access-group OUTSIDE-IN in
+exit
+
+end
+write memory
+```
+
+### Stronger submission-ready version
+
+If your instructor wants tighter rules, keep ICMP limited to testing only and allow only the exact inside-to-inside traffic required by the lab. A good explanation for your write-up is:
+
+- first allow VPN control and transport traffic
+- then allow only approved diagnostic traffic
+- finally deny and log all other inbound traffic
+
+### Firewall verification
+
+After applying the ACLs, run:
+
+```text
+show access-lists
+show run interface s0/0/0
+show crypto isakmp sa
+show crypto ipsec sa
+```
+
+Expected result:
+
+- the ACL hit counters should increase on the VPN permit rules
+- the tunnel should still establish successfully
+- unwanted inbound traffic should be blocked by the final deny
+- ping should still work if you kept the ICMP permit
+
 ## Suggested lab sequence
 
 1. Run `metrics_runner.py` before IPsec is applied.
